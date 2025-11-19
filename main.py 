@@ -1,0 +1,36 @@
+import spotipy
+from spotipy.oauth2 import SpotifyOAuth
+
+CLIENT_ID = "9d0f37f5240346fa824e3d6a1329f8d0"
+CLIENT_SECRET = "387201b705084046aa2ceb2ae1011ae5"
+REDIRECT_URI = "https://lowdata-spotify.com"
+
+SCOPE = "user-read-email user-read-private user-library-read playlist-read-private"
+
+sp = spotipy.Spotify(
+    auth_manager=SpotifyOAuth(
+        client_id=CLIENT_ID,
+        client_secret=CLIENT_SECRET,
+        redirect_uri=REDIRECT_URI,
+        scope=SCOPE,
+        cache_path=".cache-spotify"  
+    )
+)
+
+me = sp.me()
+print("Seu ID:", me["id"])
+print("Seu nome:", me["display_name"])
+print("Seu email:", me.get("email"))
+print("País:", me.get("country"))
+
+saved_tracks = sp.current_user_saved_tracks(limit=10)
+print("\nSuas 10 músicas salvas mais recentes:")
+for item in saved_tracks["items"]:
+    track = item["track"]
+    artistas = ", ".join(a["name"] for a in track["artists"])
+    print(f"- {track['name']} — {artistas}")
+
+playlists = sp.current_user_playlists(limit=10)
+print("\nSuas 10 primeiras playlists:")
+for pl in playlists["items"]:
+    print(f"- {pl['name']} (id: {pl['id']})")
